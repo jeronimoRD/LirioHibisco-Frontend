@@ -2,16 +2,14 @@
   "expo": {
     "name": "frontend",
     "slug": "frontend",
+    "scheme": "your-app-scheme",
     "version": "1.0.0",
-
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro"
     },
-
     "experiments": {
-      "tsconfigPaths": true
+      "typedRoutes": true
     },
-
     "plugins": [
       [
         "expo-splash-screen",
@@ -19,15 +17,16 @@
           "image": "./assets/splash.png",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-status-bar",
+      "expo-router"
     ],
-
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-
     "userInterfaceStyle": "light",
-
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
