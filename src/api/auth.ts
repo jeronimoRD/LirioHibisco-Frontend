@@ -1,55 +1,68 @@
-/**
- * Endpoints de autenticación (prefijo /api/auth) y la traducción entre el
- * español del servidor y el inglés de la app.
- */
+import type { User } from '../types';
+import { request, setToken } from './client';
 
-import type { Role, User } from '../types';
-import { request } from './client';
-
-/** Forma en que el backend devuelve un usuario en este proyecto. */
 interface UserResponse {
   id: string;
   email: string;
   user_name: string;
 }
 
-interface SessionResponse {
+interface AuthResponse {
   message: string;
   user: UserResponse;
+  token?: string;
 }
 
-/** Convierte la respuesta del servidor al tipo `User` de la app. */
 function toUser(data: UserResponse): User {
   return {
     id: data.id,
     name: data.user_name,
     email: data.email,
-    // El backend no devuelve rol/activo: asignamos valores por defecto.
     role: 'SOLICITANTE',
     active: true,
   };
 }
 
-/** POST /users/login -> token de sesión y usuario que entró. */
-export async function login(email: string, password: string): Promise<User> {
-  const session = await request<SessionResponse>('/users/login', {
-    email,
-    password,
-  });
-  return toUser(session.user);
+export async function login(
+  email: string,
+  password: string,
+): Promise<User> {
+  const response = await request<AuthResponse>(
+    '/users/login',
+    {
+      email,
+      password,
+    },
+  );
+
+  if (response.token) {
+    setToken(response.token);
+  }
+
+  return toUser(response.user);
 }
 
-/** POST /users/register -> el usuario creado (201). Ojo: NO devuelve token. */
-export async function register(name: string, email: string, password: string): Promise<User> {
-  const res = await request<SessionResponse>('/users/register', {
-    email,
-    user_name: name,
-    password,
-  });
-  return toUser(res.user);
+export async function register(
+  name: string,
+  email: string,
+  password: string,
+): Promise<User> {
+  const response = await request<AuthResponse>(
+    '/users/register',
+    {
+      email,
+      user_name: name,
+      password,
+    },
+  );
+
+  if (response.token) {
+    setToken(response.token);
+  }
+
+  return toUser(response.user);
 }
 
-/** GET /auth/perfil -> el usuario de la sesión actual. Requiere token. */
-export async function profile(): Promise<User> {
-  return toUser(await request<UserResponse>('/auth/perfil'));
+export function logout(): void {
+  setToken(null);
 }

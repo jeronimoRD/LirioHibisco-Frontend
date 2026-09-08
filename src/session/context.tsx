@@ -51,7 +51,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
         // enseguida iniciamos sesión con las mismas credenciales para que el
         // usuario entre de una vez y no tenga que escribirlas dos veces.
         signUp: async (name, email, password) => {
-          await api.register(name.trim(), email.trim().toLowerCase(), password);
+          await api.register(
+            name.trim(),
+            email.trim().toLowerCase(),
+            password,
+          );
+
           await signIn(email, password);
         },
         signOut: () => {
